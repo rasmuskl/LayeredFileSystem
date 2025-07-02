@@ -10,7 +10,7 @@ public class ChangeDetectorTests
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var pathNormalizer = new PathNormalizer(fileSystem);
+        var pathNormalizer = new PathNormalizer();
         var detector = new ChangeDetector(fileSystem, pathNormalizer);
 
         var before = new DirectorySnapshot();
@@ -43,7 +43,7 @@ public class ChangeDetectorTests
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var pathNormalizer = new PathNormalizer(fileSystem);
+        var pathNormalizer = new PathNormalizer();
         var detector = new ChangeDetector(fileSystem, pathNormalizer);
 
         var before = new DirectorySnapshot
@@ -76,7 +76,7 @@ public class ChangeDetectorTests
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var pathNormalizer = new PathNormalizer(fileSystem);
+        var pathNormalizer = new PathNormalizer();
         var detector = new ChangeDetector(fileSystem, pathNormalizer);
 
         var before = new DirectorySnapshot
@@ -122,7 +122,7 @@ public class ChangeDetectorTests
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var pathNormalizer = new PathNormalizer(fileSystem);
+        var pathNormalizer = new PathNormalizer();
         var detector = new ChangeDetector(fileSystem, pathNormalizer);
 
         // Act

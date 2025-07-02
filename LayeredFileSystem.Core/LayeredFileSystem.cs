@@ -34,7 +34,7 @@ public class LayeredFileSystem(IFileSystem? fileSystem = null) : ILayeredFileSys
             _fileSystem.Directory.CreateDirectory(cacheDirectory);
         }
 
-        var pathNormalizer = new PathNormalizer(_fileSystem);
+        var pathNormalizer = new PathNormalizer();
         var changeDetector = new ChangeDetector(_fileSystem, pathNormalizer);
         var layerCache = new LayerCache(_fileSystem, cacheDirectory);
         var tarReader = new TarLayerReader(_fileSystem, pathNormalizer);

@@ -18,7 +18,7 @@ public class PathNormalizerTests
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var normalizer = new PathNormalizer(fileSystem);
+        var normalizer = new PathNormalizer();
 
         // Act
         var result = normalizer.NormalizePath(input);
@@ -32,7 +32,7 @@ public class PathNormalizerTests
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var normalizer = new PathNormalizer(fileSystem);
+        var normalizer = new PathNormalizer();
         var existingPaths = new[] { "Path/To/File.txt", "another/path" };
 
         // Act
@@ -47,7 +47,7 @@ public class PathNormalizerTests
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var normalizer = new PathNormalizer(fileSystem);
+        var normalizer = new PathNormalizer();
         var existingPaths = new[] { "Path/To/Different.txt", "another/path" };
 
         // Act

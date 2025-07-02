@@ -2,36 +2,33 @@ using System.IO.Abstractions;
 
 namespace LayeredFileSystem.Core;
 
-public class PathNormalizer(IFileSystem fileSystem) : IPathNormalizer
+public class PathNormalizer : IPathNormalizer
 {
     public string NormalizePath(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return string.Empty;
 
-        // Replace all directory separators with the current platform's separator
-        var normalized = path.Replace('\\', fileSystem.Path.DirectorySeparatorChar)
-                            .Replace('/', fileSystem.Path.DirectorySeparatorChar);
+        // Always use forward slashes for normalized paths (platform-independent)
+        var normalized = path.Replace('\\', '/');
 
         // Remove any duplicate separators
-        while (normalized.Contains($"{fileSystem.Path.DirectorySeparatorChar}{fileSystem.Path.DirectorySeparatorChar}"))
+        while (normalized.Contains("//"))
         {
-            normalized = normalized.Replace(
-                $"{fileSystem.Path.DirectorySeparatorChar}{fileSystem.Path.DirectorySeparatorChar}",
-                fileSystem.Path.DirectorySeparatorChar.ToString());
+            normalized = normalized.Replace("//", "/");
         }
 
         // Remove leading separator for relative paths
         // For layered file system, we want all paths to be relative
-        if (normalized.StartsWith(fileSystem.Path.DirectorySeparatorChar))
+        if (normalized.StartsWith("/"))
         {
             normalized = normalized.Substring(1);
         }
 
         // Remove trailing separator
-        if (normalized.Length > 0 && normalized.EndsWith(fileSystem.Path.DirectorySeparatorChar))
+        if (normalized.Length > 0 && normalized.EndsWith("/"))
         {
-            normalized = normalized.TrimEnd(fileSystem.Path.DirectorySeparatorChar);
+            normalized = normalized.TrimEnd('/');
         }
 
         return normalized;

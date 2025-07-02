@@ -90,7 +90,7 @@ public class TestFileSystemBuilder
     /// </summary>
     public async Task<DirectorySnapshot> BuildSnapshotAsync()
     {
-        var pathNormalizer = new PathNormalizer(_fileSystem);
+        var pathNormalizer = new PathNormalizer();
         var changeDetector = new ChangeDetector(_fileSystem, pathNormalizer);
         return await changeDetector.CreateSnapshotAsync(_tempDirectory);
     }
@@ -110,7 +110,13 @@ public class TestFileSystemBuilder
     /// </summary>
     public IEnumerable<string> ListAllFiles()
     {
-        return _fileSystem.AllFiles.Where(f => f.StartsWith(_tempDirectory));
+        // Normalize the temp directory path for comparison
+        var normalizedTempDir = _fileSystem.Path.GetFullPath(_tempDirectory);
+        return _fileSystem.AllFiles.Where(f => 
+        {
+            var normalizedFile = _fileSystem.Path.GetFullPath(f);
+            return normalizedFile.StartsWith(normalizedTempDir, StringComparison.OrdinalIgnoreCase);
+        });
     }
 
     /// <summary>

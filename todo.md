@@ -9,7 +9,7 @@
 - [x] Fix LayerContext constructor blocking with `.Result` (potential deadlock) - LayerContext.cs:41
 - [x] Implement proper rollback for cached layers instead of throwing exception - LayerContext.cs:120-126
 - [x] Add duplicate path validation using `PathNormalizer.HasDuplicate` method
-- [ ] Fix path normalization tests failing on Windows platform
+- [x] Fix path normalization tests failing on Windows platform
 - [x] Fix layer statistics calculation - file counts are 0 but byte counts work (Windows issue)
 - [x] Fix sample project third layer logic - attempting to reuse first layer in same session doesn't make sense
 
