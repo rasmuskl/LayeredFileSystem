@@ -16,7 +16,7 @@ public class LayeredFileSystemTests
         fileSystem.Directory.CreateDirectory(workingDir);
         fileSystem.Directory.CreateDirectory(cacheDir);
         
-        var layeredFs = new Core.LayeredFileSystem(fileSystem);
+        var layeredFs = new LayerFileSystem(fileSystem);
 
         // Act
         using var session = await layeredFs.CreateSessionAsync(workingDir, cacheDir);
@@ -39,7 +39,7 @@ public class LayeredFileSystemTests
         fileSystem.Directory.CreateDirectory(cacheDir);
         fileSystem.File.WriteAllText($"{workingDir}/existing.txt", "content");
         
-        var layeredFs = new Core.LayeredFileSystem(fileSystem);
+        var layeredFs = new LayerFileSystem(fileSystem);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<LayeredFileSystemException>(
@@ -52,7 +52,7 @@ public class LayeredFileSystemTests
     public async Task CreateSessionAsync_WithInvalidArguments_ShouldThrow()
     {
         // Arrange
-        var layeredFs = new Core.LayeredFileSystem();
+        var layeredFs = new LayerFileSystem();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(

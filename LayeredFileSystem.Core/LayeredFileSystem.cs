@@ -2,7 +2,7 @@ using System.IO.Abstractions;
 
 namespace LayeredFileSystem.Core;
 
-public class LayeredFileSystem(IFileSystem? fileSystem = null) : ILayeredFileSystem
+public class LayerFileSystem(IFileSystem? fileSystem = null) : ILayeredFileSystem
 {
     private readonly IFileSystem _fileSystem = fileSystem ?? new FileSystem();
 
@@ -15,7 +15,7 @@ public class LayeredFileSystem(IFileSystem? fileSystem = null) : ILayeredFileSys
     /// <returns>A new layer session</returns>
     public static async Task<ILayerSession> StartSession(string workingDirectory, string cacheDirectory, CancellationToken cancellationToken = default)
     {
-        var fileSystem = new LayeredFileSystem();
+        var fileSystem = new LayerFileSystem();
         return await fileSystem.CreateSessionAsync(workingDirectory, cacheDirectory, cancellationToken);
     }
 
@@ -30,7 +30,7 @@ public class LayeredFileSystem(IFileSystem? fileSystem = null) : ILayeredFileSys
         var workingDir = Path.Combine(tempDir, "layered-fs-working", Guid.NewGuid().ToString());
         var cacheDir = Path.Combine(tempDir, "layered-fs-cache");
         
-        var fileSystem = new LayeredFileSystem();
+        var fileSystem = new LayerFileSystem();
         return await fileSystem.CreateSessionAsync(workingDir, cacheDir, cancellationToken);
     }
 

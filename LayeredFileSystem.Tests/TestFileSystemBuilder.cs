@@ -122,9 +122,9 @@ public class TestFileSystemBuilder
     /// <summary>
     /// Create a layered file system instance using this mock file system
     /// </summary>
-    public Core.LayeredFileSystem CreateLayeredFileSystem()
+    public LayerFileSystem CreateLayeredFileSystem()
     {
-        return new Core.LayeredFileSystem(_fileSystem);
+        return new LayerFileSystem(_fileSystem);
     }
 
     /// <summary>

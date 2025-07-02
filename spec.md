@@ -108,13 +108,13 @@ public class LayerStatistics
 
 ```csharp
 // Clean, static factory method approach
-using var session = await LayeredFileSystem.StartSession(
+using var session = await LayerFileSystem.StartSession(
     workingDirectory: "/tmp/build", 
     cacheDirectory: "/tmp/cache"
 );
 
 // Or use temporary directories for quick testing
-using var tempSession = await LayeredFileSystem.StartTemporarySession();
+using var tempSession = await LayerFileSystem.StartTemporarySession();
 
 // Step 1: Initial setup
 using (var layer1 = await session.BeginLayerAsync("setup-base-v1"))
