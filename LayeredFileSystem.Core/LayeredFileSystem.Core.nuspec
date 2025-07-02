@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>LayeredFileSystem.Core</id>
+    <version>1.0.0</version>
+    <title>LayeredFileSystem</title>
+    <authors>Rasmus Kromann-Larsen</authors>
+    <owners>Rasmus Kromann-Larsen</owners>
+    <description>
+      A .NET library that brings Docker-like layered file system capabilities to your applications. 
+      
+      Perfect for build systems, package managers, development tools, or any application that needs to efficiently manage file changes over time. Think of it like "Git for file systems" - create incremental snapshots that stack on top of each other with intelligent caching.
+      
+      Key features:
+      • Docker-style layer management with TAR archive storage
+      • Smart hash-based caching - identical layers are reused automatically  
+      • Cross-platform compatibility (Windows, Linux, macOS)
+      • Memory-efficient streaming for large files
+      • Case-insensitive path handling
+      • Docker-compatible whiteout files for deletions
+      • Clean, simple API with static factory methods
+      
+      Use cases:
+      • Build system caching (cache dependencies, compilation steps, etc.)
+      • Package managers (apply packages as layers)
+      • Development environments (isolated environments with shared base layers)
+      • Game modding systems
+      • Incremental backup solutions
+    </description>
+    <summary>Docker-like layered file system for .NET - perfect for build systems, package managers, and development tools that need efficient file change management with caching.</summary>
+    <releaseNotes>
+      Initial release with core layered file system functionality:
+      • Layer creation and caching with hash-based lookup
+      • TAR archive storage with Docker-compatible format
+      • Cross-platform path normalization
+      • Comprehensive test suite (28+ tests)
+      • Clean API with LayerFileSystem.StartSession() entry point
+      • Support for whiteout files and directory deletions
+    </releaseNotes>
+    <copyright>Copyright © 2025 Rasmus Kromann-Larsen</copyright>
+    <language>en-US</language>
+    <tags>layered-filesystem docker build-system caching tar archives package-manager development-tools</tags>
+    <repository type="git" url="https://github.com/rasmuskl/LayeredFileSystem" />
+    <projectUrl>https://github.com/rasmuskl/LayeredFileSystem</projectUrl>
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+      <group targetFramework="net9.0">
+        <dependency id="System.IO.Abstractions" version="21.0.29" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\net9.0\LayeredFileSystem.Core.dll" target="lib\net9.0\LayeredFileSystem.Core.dll" />
+    <file src="bin\Release\net9.0\LayeredFileSystem.Core.pdb" target="lib\net9.0\LayeredFileSystem.Core.pdb" />
+    <file src="bin\Release\net9.0\LayeredFileSystem.Core.xml" target="lib\net9.0\LayeredFileSystem.Core.xml" />
+    <file src="..\README.md" target="README.md" />
+    <file src="..\LICENSE" target="LICENSE" />
+  </files>
+</package>

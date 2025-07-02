@@ -4,10 +4,39 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Package Information -->
+    <PackageId>LayeredFileSystem.Core</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>LayeredFileSystem</Title>
+    <Authors>Rasmus Kromann-Larsen</Authors>
+    <Description>Docker-like layered file system for .NET - perfect for build systems, package managers, and development tools that need efficient file change management with caching.</Description>
+    <Summary>A .NET library that brings Docker-like layered file system capabilities to your applications with intelligent caching and cross-platform compatibility.</Summary>
+    <PackageTags>layered-filesystem;docker;build-system;caching;tar;archives;package-manager;development-tools</PackageTags>
+    <PackageProjectUrl>https://github.com/rasmuskl/LayeredFileSystem</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rasmuskl/LayeredFileSystem</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial release with core layered file system functionality: Layer creation and caching, TAR archive storage, cross-platform support, comprehensive test suite.</PackageReleaseNotes>
+    <Copyright>Copyright © 2025 Rasmus Kromann-Larsen</Copyright>
+    
+    <!-- Generate package on build -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <!-- Documentation -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.IO.Abstractions" Version="21.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
