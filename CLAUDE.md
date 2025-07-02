@@ -116,6 +116,38 @@ The sample demonstrates:
 - Cache hit/miss scenarios across sessions
 - Proper resource disposal
 
+## Benchmark Commands
+
+```bash
+# Run all benchmarks
+dotnet run --project LayeredFileSystem.Benchmarks -c Release
+
+# Run cache performance benchmarks only
+dotnet run --project LayeredFileSystem.Benchmarks -c Release cache
+
+# Run system overhead benchmarks only
+dotnet run --project LayeredFileSystem.Benchmarks -c Release overhead
+
+# Build benchmarks project
+dotnet build LayeredFileSystem.Benchmarks -c Release
+```
+
+### Benchmark Suites
+
+**Cache Benchmarks** - Measure cache performance benefits:
+- Cache hit vs miss scenarios
+- Large file operations
+- Multiple file operations
+- Layer creation and application workflows
+
+**Overhead Benchmarks** - Measure system overhead:
+- Direct file operations baseline
+- Layered system overhead comparison
+- Session creation overhead
+- Change detection overhead
+- TAR read/write overhead
+- Path normalization overhead
+
 ## Known Working Platforms
 
 - ✅ **Linux** (Ubuntu on WSL2)

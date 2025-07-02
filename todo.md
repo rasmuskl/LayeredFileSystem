@@ -42,6 +42,11 @@
 - [ ] Review buffer sizes for file I/O operations (spec recommends 64KB)
 - [ ] Add parallel processing for independent file operations
 - [ ] Optimize change detection using file modification times and sizes
+- [ ] Add CPU-heavy benchmark scenarios where cache saves expensive recomputations:
+  - Hash calculation intensive scenarios (large files, many files)
+  - TAR compression/decompression operations 
+  - Change detection on large directory trees
+  - Path normalization on complex nested structures
 
 ## Documentation
 - [x] Create README.md for the project
