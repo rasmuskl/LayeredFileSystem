@@ -10,6 +10,14 @@ try
     // Ensure directories exist
     Directory.CreateDirectory(workingDir);
     Directory.CreateDirectory(cacheDir);
+    
+    // Clear cache to ensure consistent demo behavior
+    if (Directory.Exists(cacheDir))
+    {
+        Directory.Delete(cacheDir, recursive: true);
+        Directory.CreateDirectory(cacheDir);
+        Console.WriteLine("Cleared cache for consistent demo");
+    }
 
     Console.WriteLine($"Working Directory: {workingDir}");
     Console.WriteLine($"Cache Directory: {cacheDir}");
@@ -168,18 +176,18 @@ static void PrintDirectoryContents(string path, string indent)
         {
             var fileName = Path.GetFileName(file);
             var size = new FileInfo(file).Length;
-            Console.WriteLine($"{indent}📄 {fileName} ({size} bytes)");
+            Console.WriteLine($"{indent}[FILE] {fileName} ({size} bytes)");
         }
 
         foreach (var directory in Directory.GetDirectories(path))
         {
             var dirName = Path.GetFileName(directory);
-            Console.WriteLine($"{indent}📁 {dirName}/");
+            Console.WriteLine($"{indent}[DIR]  {dirName}/");
             PrintDirectoryContents(directory, indent + "  ");
         }
     }
     catch (UnauthorizedAccessException)
     {
-        Console.WriteLine($"{indent}❌ Access denied");
+        Console.WriteLine($"{indent}[ERROR] Access denied");
     }
 }
