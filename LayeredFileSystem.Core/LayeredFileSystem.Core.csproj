@@ -26,7 +26,6 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <!-- Documentation -->
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
