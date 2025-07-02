@@ -4,7 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a .NET library implementing a Docker-like layered file system using TAR archives for layer storage. The library provides an imperative API for creating, caching, and applying file system layers with cross-platform compatibility.
+This is a **complete** .NET library implementing a Docker-like layered file system using TAR archives for layer storage. The library provides an imperative API for creating, caching, and applying file system layers with full cross-platform compatibility.
+
+## Implementation Status
+
+✅ **COMPLETE** - All core functionality implemented and tested:
+- All spec interfaces and models implemented
+- Comprehensive unit and integration tests (28 tests)
+- Cross-platform compatibility verified (Windows + Linux)
+- Sample project demonstrating usage
+- Full documentation and README
 
 ## Build Commands
 
@@ -24,6 +33,7 @@ dotnet clean
 
 ## Testing Commands
 
+### Standard Testing (Linux/WSL)
 ```bash
 # Run all tests
 dotnet test
@@ -33,7 +43,25 @@ dotnet test --collect:"XPlat Code Coverage"
 
 # Run specific test project
 dotnet test LayeredFileSystem.Tests/
+
+# Run tests with detailed output
+dotnet test --logger "console;verbosity=detailed"
 ```
+
+### Cross-Platform Testing (Windows from WSL)
+```bash
+# Run tests on Windows .NET from WSL (for cross-platform verification)
+powershell.exe -Command "cd 'C:\dev\experiments\LayeredFileSystem'; dotnet test --verbosity normal"
+
+# Run tests with detailed output on Windows
+powershell.exe -Command "cd 'C:\dev\experiments\LayeredFileSystem'; dotnet test --logger 'console;verbosity=detailed'"
+```
+
+### Test Coverage
+- **Total Tests**: 28 (all passing on both Linux and Windows)
+- **Unit Tests**: PathNormalizer, ChangeDetector, LayeredFileSystem, TestFileSystemBuilder
+- **Integration Tests**: Full workflows, caching, whiteout files, large files, rollback
+- **Cross-Platform**: Verified on Windows and Linux
 
 ## Architecture
 
@@ -71,6 +99,33 @@ Custom exception hierarchy including:
 
 - Target Framework: .NET 9.0
 - Key Dependencies: System.Formats.Tar, System.IO.Abstractions
-- Test Framework: xUnit (when implemented)
+- Test Framework: xUnit with System.IO.Abstractions.TestingHelpers
 - All APIs are async with CancellationToken support
 - Nullable reference types enabled
+
+## Sample Usage
+
+```bash
+# Run the sample application
+dotnet run --project LayeredFileSystem.Sample
+```
+
+The sample demonstrates:
+- Creating layered file systems with caching
+- Layer creation and application
+- Cache hit/miss scenarios across sessions
+- Proper resource disposal
+
+## Known Working Platforms
+
+- ✅ **Linux** (Ubuntu on WSL2)
+- ✅ **Windows** (.NET 9.0)
+- ✅ **Cross-platform** path handling verified
+
+## Development Notes
+
+- Use `todo.md` for tracking remaining tasks and improvements
+- Path normalization uses forward slashes for platform consistency
+- TAR layers use PAX format for maximum compatibility
+- All file operations use System.IO.Abstractions for testability
+- Comprehensive integration tests cover real-world scenarios
