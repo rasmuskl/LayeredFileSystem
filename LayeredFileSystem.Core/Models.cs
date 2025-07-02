@@ -23,6 +23,7 @@ public class FileChange
     public string RelativePath { get; set; } = string.Empty;
     public ChangeType Type { get; set; }
     public FileInfo? FileInfo { get; set; }
+    public bool IsDirectory { get; set; }
 }
 
 public enum ChangeType

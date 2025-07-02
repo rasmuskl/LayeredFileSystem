@@ -10,11 +10,35 @@ public class TarLayerWriter(IFileSystem fileSystem, IPathNormalizer pathNormaliz
         string baseDirectory,
         Stream outputStream)
     {
+        // Validate for duplicate paths (case-insensitive)
+        ValidateNoDuplicatePaths(changes);
+        
         using var writer = new TarWriter(outputStream, TarEntryFormat.Pax, leaveOpen: true);
 
         foreach (var change in changes)
         {
             await ProcessChangeAsync(writer, change, baseDirectory);
+        }
+    }
+
+    private void ValidateNoDuplicatePaths(IReadOnlyList<FileChange> changes)
+    {
+        var normalizedPaths = new List<string>();
+        
+        foreach (var change in changes)
+        {
+            var normalizedPath = pathNormalizer.NormalizePath(change.RelativePath);
+            
+            if (pathNormalizer.HasDuplicate(normalizedPath, normalizedPaths))
+            {
+                // Find the existing path that conflicts
+                var existingPath = normalizedPaths.First(p => 
+                    string.Equals(pathNormalizer.NormalizePath(p), normalizedPath, StringComparison.OrdinalIgnoreCase));
+                
+                throw new DuplicatePathException(change.RelativePath, existingPath);
+            }
+            
+            normalizedPaths.Add(normalizedPath);
         }
     }
 

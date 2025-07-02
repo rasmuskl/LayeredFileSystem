@@ -28,7 +28,7 @@ public class LayerSession(
         if (string.IsNullOrWhiteSpace(inputHash))
             throw new ArgumentException("Input hash cannot be null or empty", nameof(inputHash));
 
-        return new LayerContext(
+        var context = new LayerContext(
             fileSystem,
             workingDirectory,
             inputHash, // Use input hash as the identifier
@@ -38,6 +38,11 @@ public class LayerSession(
             tarWriter,
             pathNormalizer,
             this);
+            
+        // Initialize the context asynchronously
+        await context.InitializeAsync();
+        
+        return context;
     }
 
     internal void AddAppliedLayer(LayerInfo layerInfo)

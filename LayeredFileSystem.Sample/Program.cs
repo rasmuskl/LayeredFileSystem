@@ -91,18 +91,8 @@ namespace Sample
     }
 
     Console.WriteLine();
-
-    // Step 3: Test cache hit by running same step again
-    Console.WriteLine("Step 3: Testing cache hit (running step 1 again)");
-    using (var layer3 = await session.BeginLayerAsync("setup-base-v1"))
-    {
-        Console.WriteLine($"Layer from cache: {layer3.IsFromCache}");
-        await layer3.CommitAsync();
-    }
-
-    Console.WriteLine();
-    Console.WriteLine("Applied Layers Summary:");
-    Console.WriteLine("======================");
+    Console.WriteLine("Applied Layers Summary (Session 1):");
+    Console.WriteLine("===================================");
     
     for (int i = 0; i < session.AppliedLayers.Count; i++)
     {
@@ -113,10 +103,43 @@ namespace Sample
     }
 
     Console.WriteLine();
-    Console.WriteLine("Final working directory contents:");
-    Console.WriteLine("=================================");
+    Console.WriteLine("Final working directory contents (Session 1):");
+    Console.WriteLine("=============================================");
     
     PrintDirectoryContents(session.WorkingDirectory, "");
+    
+    Console.WriteLine();
+
+    // Step 3: Demonstrate cache reuse with a new session
+    Console.WriteLine("Step 3: Testing cache hit with new session");
+    var newWorkingDir = Path.Combine(tempDir, "layered-fs-sample", Guid.NewGuid().ToString());
+    Directory.CreateDirectory(newWorkingDir);
+    
+    Console.WriteLine($"New Working Directory: {newWorkingDir}");
+    
+    using var newSession = await fileSystem.CreateSessionAsync(newWorkingDir, cacheDir);
+    
+    // Recreate the same layers - should hit cache
+    using (var cachedLayer1 = await newSession.BeginLayerAsync("setup-base-v1"))
+    {
+        Console.WriteLine($"Layer 1 from cache: {cachedLayer1.IsFromCache}");
+        await cachedLayer1.CommitAsync();
+    }
+    
+    using (var cachedLayer2 = await newSession.BeginLayerAsync("add-source-v1"))
+    {
+        Console.WriteLine($"Layer 2 from cache: {cachedLayer2.IsFromCache}");
+        await cachedLayer2.CommitAsync();
+    }
+    
+    Console.WriteLine();
+    Console.WriteLine("Final working directory contents (Session 2 - from cache):");
+    Console.WriteLine("=========================================================");
+    
+    PrintDirectoryContents(newSession.WorkingDirectory, "");
+    
+    // Clean up second working directory
+    Directory.Delete(newWorkingDir, recursive: true);
 }
 catch (Exception ex)
 {

@@ -24,7 +24,8 @@ public class ChangeDetector(IFileSystem fileSystem, IPathNormalizer pathNormaliz
                 {
                     RelativePath = normalizedPath,
                     Type = ChangeType.Added,
-                    FileInfo = afterMetadata.IsDirectory ? null : new FileInfo(afterMetadata.RelativePath)
+                    FileInfo = afterMetadata.IsDirectory ? null : new FileInfo(afterMetadata.RelativePath),
+                    IsDirectory = afterMetadata.IsDirectory
                 });
             }
             else if (!AreMetadataEqual(beforeMetadata, afterMetadata))
@@ -34,7 +35,8 @@ public class ChangeDetector(IFileSystem fileSystem, IPathNormalizer pathNormaliz
                 {
                     RelativePath = normalizedPath,
                     Type = ChangeType.Modified,
-                    FileInfo = afterMetadata.IsDirectory ? null : new FileInfo(afterMetadata.RelativePath)
+                    FileInfo = afterMetadata.IsDirectory ? null : new FileInfo(afterMetadata.RelativePath),
+                    IsDirectory = afterMetadata.IsDirectory
                 });
             }
         }
@@ -51,7 +53,8 @@ public class ChangeDetector(IFileSystem fileSystem, IPathNormalizer pathNormaliz
                 {
                     RelativePath = normalizedPath,
                     Type = ChangeType.Deleted,
-                    FileInfo = null
+                    FileInfo = null,
+                    IsDirectory = beforeMetadata.IsDirectory
                 });
             }
         }
