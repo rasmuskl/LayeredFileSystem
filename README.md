@@ -1,5 +1,7 @@
 # LayeredFileSystem
 
+> **Note**: This library and documentation were primarily generated using [Claude Code](https://claude.ai/code) as an exploration of AI-assisted software development. While the code is functional and well-tested, please evaluate it thoroughly for production use.
+
 Ever wondered how Docker builds work so fast? Or how package managers can efficiently track and apply changes to your project? This library brings that same **layered file system** magic to your .NET applications.
 
 **LayeredFileSystem** lets you build file systems incrementally - like creating snapshots that stack on top of each other. Perfect for build systems, package managers, development tools, or any application that needs to efficiently manage file changes over time.
@@ -168,6 +170,10 @@ cd LayeredFileSystem.Core
 dotnet pack --configuration Release
 # Creates LayeredFileSystem.Core.1.0.0.nupkg in bin/Release/
 ```
+
+## Development
+
+Includes GitHub Actions for CI/CD with GitTreeVersion. To publish releases, set the `NUGET_API_KEY` secret in your repository.
 
 ## TAR Layer Format
 

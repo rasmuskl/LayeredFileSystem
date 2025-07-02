@@ -7,7 +7,6 @@
     
     <!-- Package Information -->
     <PackageId>LayeredFileSystem.Core</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
     <Title>LayeredFileSystem</Title>
     <Authors>Rasmus Kromann-Larsen</Authors>
     <Description>Docker-like layered file system for .NET - perfect for build systems, package managers, and development tools that need efficient file change management with caching.</Description>
