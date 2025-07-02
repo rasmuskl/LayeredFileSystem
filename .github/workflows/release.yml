@@ -51,9 +51,20 @@ jobs:
     - name: Push to NuGet
       run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
       
+    - name: Get version for release
+      id: release_version
+      run: |
+        if [ "${{ github.event_name }}" = "push" ] && [ "${{ startsWith(github.ref, 'refs/tags/') }}" = "true" ]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          VERSION=$(find ./artifacts -name "*.nupkg" | head -1 | sed 's/.*LayeredFileSystem.Core.\(.*\)\.nupkg/\1/')
+          echo "VERSION=v${VERSION}" >> $GITHUB_OUTPUT
+        fi
+        
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: ${{ steps.release_version.outputs.VERSION }}
         files: ./artifacts/*.nupkg
         generate_release_notes: true
         draft: false
