@@ -3,17 +3,8 @@ using System.IO.Abstractions;
 
 namespace LayeredFileSystem.Core;
 
-public class TarLayerWriter : ITarLayerWriter
+public class TarLayerWriter(IFileSystem fileSystem, IPathNormalizer pathNormalizer) : ITarLayerWriter
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly IPathNormalizer _pathNormalizer;
-
-    public TarLayerWriter(IFileSystem fileSystem, IPathNormalizer pathNormalizer)
-    {
-        _fileSystem = fileSystem;
-        _pathNormalizer = pathNormalizer;
-    }
-
     public async Task CreateLayerAsync(
         IReadOnlyList<FileChange> changes,
         string baseDirectory,
@@ -29,7 +20,7 @@ public class TarLayerWriter : ITarLayerWriter
 
     private async Task ProcessChangeAsync(TarWriter writer, FileChange change, string baseDirectory)
     {
-        var normalizedPath = _pathNormalizer.NormalizePath(change.RelativePath);
+        var normalizedPath = pathNormalizer.NormalizePath(change.RelativePath);
         
         switch (change.Type)
         {
@@ -46,14 +37,14 @@ public class TarLayerWriter : ITarLayerWriter
 
     private async Task AddFileToTarAsync(TarWriter writer, string relativePath, string baseDirectory)
     {
-        var fullPath = _fileSystem.Path.Combine(baseDirectory, relativePath);
+        var fullPath = fileSystem.Path.Combine(baseDirectory, relativePath);
         
-        if (!_fileSystem.File.Exists(fullPath) && !_fileSystem.Directory.Exists(fullPath))
+        if (!fileSystem.File.Exists(fullPath) && !fileSystem.Directory.Exists(fullPath))
         {
             return;
         }
 
-        if (_fileSystem.Directory.Exists(fullPath))
+        if (fileSystem.Directory.Exists(fullPath))
         {
             // Add directory entry
             var dirEntry = new PaxTarEntry(TarEntryType.Directory, relativePath);
@@ -62,8 +53,8 @@ public class TarLayerWriter : ITarLayerWriter
         else
         {
             // Add file entry
-            var fileInfo = _fileSystem.FileInfo.New(fullPath);
-            using var fileStream = _fileSystem.File.OpenRead(fullPath);
+            var fileInfo = fileSystem.FileInfo.New(fullPath);
+            using var fileStream = fileSystem.File.OpenRead(fullPath);
             var fileEntry = new PaxTarEntry(TarEntryType.RegularFile, relativePath)
             {
                 DataStream = fileStream
@@ -75,14 +66,14 @@ public class TarLayerWriter : ITarLayerWriter
 
     private async Task AddWhiteoutFileAsync(TarWriter writer, string relativePath)
     {
-        var directoryPath = _fileSystem.Path.GetDirectoryName(relativePath) ?? string.Empty;
-        var fileName = _fileSystem.Path.GetFileName(relativePath);
+        var directoryPath = fileSystem.Path.GetDirectoryName(relativePath) ?? string.Empty;
+        var fileName = fileSystem.Path.GetFileName(relativePath);
         
         // Check if this is a directory deletion
         if (IsDirectoryDeletion(relativePath))
         {
             // Use .wh..wh..opq for directory deletions
-            var opqPath = _fileSystem.Path.Combine(relativePath, ".wh..wh..opq");
+            var opqPath = fileSystem.Path.Combine(relativePath, ".wh..wh..opq");
             using var emptyStream = new MemoryStream();
             var opqEntry = new PaxTarEntry(TarEntryType.RegularFile, opqPath)
             {
@@ -96,7 +87,7 @@ public class TarLayerWriter : ITarLayerWriter
             var whiteoutFileName = $".wh.{fileName}";
             var whiteoutPath = string.IsNullOrEmpty(directoryPath) 
                 ? whiteoutFileName 
-                : _fileSystem.Path.Combine(directoryPath, whiteoutFileName);
+                : fileSystem.Path.Combine(directoryPath, whiteoutFileName);
             
             using var emptyStream = new MemoryStream();
             var whiteoutEntry = new PaxTarEntry(TarEntryType.RegularFile, whiteoutPath)
@@ -111,6 +102,6 @@ public class TarLayerWriter : ITarLayerWriter
     {
         // This is a simplified check - in a real implementation, you might track
         // whether the original path was a directory
-        return !_fileSystem.Path.HasExtension(relativePath);
+        return !fileSystem.Path.HasExtension(relativePath);
     }
 }

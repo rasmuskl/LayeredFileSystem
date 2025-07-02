@@ -18,7 +18,7 @@ public class ChangeDetectorTests
         {
             Files = new Dictionary<string, FileMetadata>(StringComparer.OrdinalIgnoreCase)
             {
-                ["test.txt"] = new FileMetadata
+                ["test.txt"] = new()
                 {
                     RelativePath = "test.txt",
                     Size = 100,
@@ -50,7 +50,7 @@ public class ChangeDetectorTests
         {
             Files = new Dictionary<string, FileMetadata>(StringComparer.OrdinalIgnoreCase)
             {
-                ["test.txt"] = new FileMetadata
+                ["test.txt"] = new()
                 {
                     RelativePath = "test.txt",
                     Size = 100,
@@ -83,7 +83,7 @@ public class ChangeDetectorTests
         {
             Files = new Dictionary<string, FileMetadata>(StringComparer.OrdinalIgnoreCase)
             {
-                ["test.txt"] = new FileMetadata
+                ["test.txt"] = new()
                 {
                     RelativePath = "test.txt",
                     Size = 100,
@@ -97,7 +97,7 @@ public class ChangeDetectorTests
         {
             Files = new Dictionary<string, FileMetadata>(StringComparer.OrdinalIgnoreCase)
             {
-                ["test.txt"] = new FileMetadata
+                ["test.txt"] = new()
                 {
                     RelativePath = "test.txt",
                     Size = 200,

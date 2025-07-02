@@ -1,6 +1,5 @@
 using System.IO.Abstractions;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace LayeredFileSystem.Core;
 
@@ -107,13 +106,5 @@ public class LayerCache : ILayerCache
         }
         
         return _fileSystem.Path.Combine(subdirectoryPath, $"{hash}.tar");
-    }
-
-    private async Task<string> CalculateFileHashAsync(string filePath)
-    {
-        using var stream = _fileSystem.File.OpenRead(filePath);
-        using var sha256 = SHA256.Create();
-        var hashBytes = await sha256.ComputeHashAsync(stream);
-        return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
 }

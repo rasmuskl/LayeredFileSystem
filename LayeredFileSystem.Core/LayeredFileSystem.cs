@@ -2,14 +2,9 @@ using System.IO.Abstractions;
 
 namespace LayeredFileSystem.Core;
 
-public class LayeredFileSystem : ILayeredFileSystem
+public class LayeredFileSystem(IFileSystem? fileSystem = null) : ILayeredFileSystem
 {
-    private readonly IFileSystem _fileSystem;
-
-    public LayeredFileSystem(IFileSystem? fileSystem = null)
-    {
-        _fileSystem = fileSystem ?? new FileSystem();
-    }
+    private readonly IFileSystem _fileSystem = fileSystem ?? new FileSystem();
 
     public async Task<ILayerSession> CreateSessionAsync(string workingDirectory, string cacheDirectory, CancellationToken cancellationToken = default)
     {

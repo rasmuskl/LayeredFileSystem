@@ -1,5 +1,4 @@
 using System.IO.Abstractions;
-using System.Security.Cryptography;
 
 namespace LayeredFileSystem.Core;
 
@@ -233,13 +232,6 @@ public class LayerContext : ILayerContext
             
             _disposed = true;
         }
-    }
-
-    private async Task<string> CalculateTarHashAsync(Stream tarStream)
-    {
-        using var sha256 = SHA256.Create();
-        var hashBytes = await sha256.ComputeHashAsync(tarStream);
-        return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
 
     private async Task<bool> CheckAndApplyCachedLayerAsync()

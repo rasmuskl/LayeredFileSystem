@@ -1,5 +1,3 @@
-using LayeredFileSystem.Core;
-
 Console.WriteLine("LayeredFileSystem Sample Application");
 Console.WriteLine("=====================================");
 

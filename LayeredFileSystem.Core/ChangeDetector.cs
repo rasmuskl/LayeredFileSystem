@@ -4,17 +4,8 @@ using System.Text;
 
 namespace LayeredFileSystem.Core;
 
-public class ChangeDetector : IChangeDetector
+public class ChangeDetector(IFileSystem fileSystem, IPathNormalizer pathNormalizer) : IChangeDetector
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly IPathNormalizer _pathNormalizer;
-
-    public ChangeDetector(IFileSystem fileSystem, IPathNormalizer pathNormalizer)
-    {
-        _fileSystem = fileSystem;
-        _pathNormalizer = pathNormalizer;
-    }
-
     public async Task<IReadOnlyList<FileChange>> DetectChangesAsync(
         DirectorySnapshot before, 
         DirectorySnapshot after)
@@ -24,7 +15,7 @@ public class ChangeDetector : IChangeDetector
         // Find added and modified files
         foreach (var (path, afterMetadata) in after.Files)
         {
-            var normalizedPath = _pathNormalizer.NormalizePath(path);
+            var normalizedPath = pathNormalizer.NormalizePath(path);
             
             if (!before.Files.TryGetValue(normalizedPath, out var beforeMetadata))
             {
@@ -51,7 +42,7 @@ public class ChangeDetector : IChangeDetector
         // Find deleted files
         foreach (var (path, beforeMetadata) in before.Files)
         {
-            var normalizedPath = _pathNormalizer.NormalizePath(path);
+            var normalizedPath = pathNormalizer.NormalizePath(path);
             
             if (!after.Files.ContainsKey(normalizedPath))
             {
@@ -72,7 +63,7 @@ public class ChangeDetector : IChangeDetector
     {
         var snapshot = new DirectorySnapshot();
         
-        if (!_fileSystem.Directory.Exists(directoryPath))
+        if (!fileSystem.Directory.Exists(directoryPath))
         {
             return snapshot;
         }
@@ -86,27 +77,27 @@ public class ChangeDetector : IChangeDetector
         try
         {
             // Add directory entry
-            var relativePath = _fileSystem.Path.GetRelativePath(rootPath, currentPath);
+            var relativePath = fileSystem.Path.GetRelativePath(rootPath, currentPath);
             if (!string.IsNullOrEmpty(relativePath) && relativePath != ".")
             {
-                var normalizedPath = _pathNormalizer.NormalizePath(relativePath);
+                var normalizedPath = pathNormalizer.NormalizePath(relativePath);
                 snapshot.Files[normalizedPath] = new FileMetadata
                 {
                     RelativePath = normalizedPath,
                     Size = 0,
-                    LastWriteTime = _fileSystem.Directory.GetLastWriteTime(currentPath),
+                    LastWriteTime = fileSystem.Directory.GetLastWriteTime(currentPath),
                     Hash = string.Empty,
                     IsDirectory = true
                 };
             }
 
             // Process files
-            foreach (var filePath in _fileSystem.Directory.GetFiles(currentPath))
+            foreach (var filePath in fileSystem.Directory.GetFiles(currentPath))
             {
-                var fileRelativePath = _fileSystem.Path.GetRelativePath(rootPath, filePath);
-                var normalizedPath = _pathNormalizer.NormalizePath(fileRelativePath);
+                var fileRelativePath = fileSystem.Path.GetRelativePath(rootPath, filePath);
+                var normalizedPath = pathNormalizer.NormalizePath(fileRelativePath);
                 
-                var fileInfo = _fileSystem.FileInfo.New(filePath);
+                var fileInfo = fileSystem.FileInfo.New(filePath);
                 var hash = await CalculateFileHashAsync(filePath);
                 
                 snapshot.Files[normalizedPath] = new FileMetadata
@@ -120,7 +111,7 @@ public class ChangeDetector : IChangeDetector
             }
 
             // Process subdirectories
-            foreach (var subdirectoryPath in _fileSystem.Directory.GetDirectories(currentPath))
+            foreach (var subdirectoryPath in fileSystem.Directory.GetDirectories(currentPath))
             {
                 await ScanDirectoryAsync(rootPath, subdirectoryPath, snapshot);
             }
@@ -139,7 +130,7 @@ public class ChangeDetector : IChangeDetector
     {
         try
         {
-            using var stream = _fileSystem.File.OpenRead(filePath);
+            using var stream = fileSystem.File.OpenRead(filePath);
             using var sha256 = SHA256.Create();
             var hashBytes = await sha256.ComputeHashAsync(stream);
             return Convert.ToBase64String(hashBytes);
@@ -147,7 +138,7 @@ public class ChangeDetector : IChangeDetector
         catch
         {
             // If we can't read the file, return a hash based on metadata
-            var fileInfo = _fileSystem.FileInfo.New(filePath);
+            var fileInfo = fileSystem.FileInfo.New(filePath);
             var metadata = $"{fileInfo.Length}:{fileInfo.LastWriteTime:O}";
             using var sha256 = SHA256.Create();
             var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(metadata));
