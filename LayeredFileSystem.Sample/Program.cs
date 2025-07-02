@@ -23,8 +23,7 @@ try
     Console.WriteLine($"Cache Directory: {cacheDir}");
     Console.WriteLine();
 
-    var fileSystem = new LayeredFileSystem.Core.LayeredFileSystem();
-    using var session = await fileSystem.CreateSessionAsync(workingDir, cacheDir);
+    using var session = await LayeredFileSystem.Core.LayeredFileSystem.StartSession(workingDir, cacheDir);
 
     Console.WriteLine("Created layered file system session");
     Console.WriteLine();
@@ -125,7 +124,7 @@ namespace Sample
     
     Console.WriteLine($"New Working Directory: {newWorkingDir}");
     
-    using var newSession = await fileSystem.CreateSessionAsync(newWorkingDir, cacheDir);
+    using var newSession = await LayeredFileSystem.Core.LayeredFileSystem.StartSession(newWorkingDir, cacheDir);
     
     // Recreate the same layers - should hit cache
     using (var cachedLayer1 = await newSession.BeginLayerAsync("setup-base-v1"))

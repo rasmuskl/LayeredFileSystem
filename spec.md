@@ -79,9 +79,10 @@ public interface ILayerContext : IDisposable
     Task<LayerInfo> CommitAsync();
     
     /// <summary>
-    /// Cancel this layer without creating a snapshot
+    /// Cancel this layer without creating or caching a snapshot.
+    /// The working directory state is left as-is for the user to manage.
     /// </summary>
-    Task RollbackAsync();
+    Task CancelAsync();
 }
 
 public class LayerInfo
@@ -106,11 +107,14 @@ public class LayerStatistics
 ### Usage Example
 
 ```csharp
-var fileSystem = new LayeredFileSystem();
-using var session = await fileSystem.CreateSessionAsync(
+// Clean, static factory method approach
+using var session = await LayeredFileSystem.StartSession(
     workingDirectory: "/tmp/build", 
     cacheDirectory: "/tmp/cache"
 );
+
+// Or use temporary directories for quick testing
+using var tempSession = await LayeredFileSystem.StartTemporarySession();
 
 // Step 1: Initial setup
 using (var layer1 = await session.BeginLayerAsync("setup-base-v1"))

@@ -24,10 +24,9 @@ public class IntegrationTests : IDisposable
         // Arrange
         var workingDir = CreateTempDirectory("working");
         var cacheDir = CreateTempDirectory("cache");
-        var fileSystem = new Core.LayeredFileSystem();
 
         // Act & Assert
-        using var session = await fileSystem.CreateSessionAsync(workingDir, cacheDir);
+        using var session = await Core.LayeredFileSystem.StartSession(workingDir, cacheDir);
 
         // Layer 1: Create initial files
         LayerInfo layer1Info;
@@ -90,10 +89,9 @@ public class IntegrationTests : IDisposable
         var workingDir1 = CreateTempDirectory("working1");
         var workingDir2 = CreateTempDirectory("working2");
         var sharedCacheDir = CreateTempDirectory("shared-cache");
-        var fileSystem = new Core.LayeredFileSystem();
 
         // Act - First session creates layers
-        using (var session1 = await fileSystem.CreateSessionAsync(workingDir1, sharedCacheDir))
+        using (var session1 = await Core.LayeredFileSystem.StartSession(workingDir1, sharedCacheDir))
         {
             using (var layer = await session1.BeginLayerAsync("test-layer"))
             {
@@ -104,7 +102,7 @@ public class IntegrationTests : IDisposable
         }
 
         // Act - Second session reuses cache
-        using (var session2 = await fileSystem.CreateSessionAsync(workingDir2, sharedCacheDir))
+        using (var session2 = await Core.LayeredFileSystem.StartSession(workingDir2, sharedCacheDir))
         {
             using (var layer = await session2.BeginLayerAsync("test-layer"))
             {
@@ -129,10 +127,9 @@ public class IntegrationTests : IDisposable
         var workingDir1 = CreateTempDirectory("working1");
         var workingDir2 = CreateTempDirectory("working2");
         var cacheDir = CreateTempDirectory("cache");
-        var fileSystem = new Core.LayeredFileSystem();
 
         // Create initial state in first session
-        using (var session1 = await fileSystem.CreateSessionAsync(workingDir1, cacheDir))
+        using (var session1 = await Core.LayeredFileSystem.StartSession(workingDir1, cacheDir))
         {
             // Layer 1: Create files and directories
             using (var layer1 = await session1.BeginLayerAsync("create-files"))
@@ -155,7 +152,7 @@ public class IntegrationTests : IDisposable
         }
 
         // Apply same layers to second session - should get same result through cache
-        using (var session2 = await fileSystem.CreateSessionAsync(workingDir2, cacheDir))
+        using (var session2 = await Core.LayeredFileSystem.StartSession(workingDir2, cacheDir))
         {
             using (var layer1 = await session2.BeginLayerAsync("create-files"))
             {
@@ -187,10 +184,9 @@ public class IntegrationTests : IDisposable
         // Arrange
         var workingDir = CreateTempDirectory("working");
         var cacheDir = CreateTempDirectory("cache");
-        var fileSystem = new Core.LayeredFileSystem();
 
         // Act & Assert
-        using var session = await fileSystem.CreateSessionAsync(workingDir, cacheDir);
+        using var session = await Core.LayeredFileSystem.StartSession(workingDir, cacheDir);
 
         using (var layer = await session.BeginLayerAsync("case-test"))
         {
@@ -212,13 +208,12 @@ public class IntegrationTests : IDisposable
         // Arrange
         var workingDir = CreateTempDirectory("working");
         var cacheDir = CreateTempDirectory("cache");
-        var fileSystem = new Core.LayeredFileSystem();
 
         // Create a moderately large file (1MB)
         var largeContent = new string('A', 1024 * 1024);
 
         // Act
-        using var session = await fileSystem.CreateSessionAsync(workingDir, cacheDir);
+        using var session = await Core.LayeredFileSystem.StartSession(workingDir, cacheDir);
 
         LayerInfo layerInfo;
         using (var layer = await session.BeginLayerAsync("large-file-test"))
@@ -237,15 +232,14 @@ public class IntegrationTests : IDisposable
     }
 
     [Fact]
-    public async Task LayerRollback_ShouldRestorePreviousState()
+    public async Task LayerCancel_ShouldNotCacheLayer()
     {
         // Arrange
         var workingDir = CreateTempDirectory("working");
         var cacheDir = CreateTempDirectory("cache");
-        var fileSystem = new Core.LayeredFileSystem();
 
         // Act
-        using var session = await fileSystem.CreateSessionAsync(workingDir, cacheDir);
+        using var session = await Core.LayeredFileSystem.StartSession(workingDir, cacheDir);
 
         // Create initial state
         using (var layer1 = await session.BeginLayerAsync("initial"))
@@ -254,21 +248,30 @@ public class IntegrationTests : IDisposable
             await layer1.CommitAsync();
         }
 
-        // Start a layer but rollback instead of commit
-        using (var layer2 = await session.BeginLayerAsync("rollback-test"))
+        // Start a layer but cancel instead of commit
+        using (var layer2 = await session.BeginLayerAsync("cancel-test"))
         {
             File.WriteAllText(Path.Combine(workingDir, "temp.txt"), "temporary content");
             File.WriteAllText(Path.Combine(workingDir, "initial.txt"), "modified content");
             
-            // Rollback instead of commit
-            await layer2.RollbackAsync();
+            // Cancel instead of commit - this should not cache the layer
+            await layer2.CancelAsync();
         }
 
-        // Assert - Should be back to initial state
+        // Assert - Working directory state is left as-is (user manages cleanup)
         Assert.True(File.Exists(Path.Combine(workingDir, "initial.txt")));
-        Assert.False(File.Exists(Path.Combine(workingDir, "temp.txt")));
-        // Note: Due to current rollback implementation limitations, 
-        // we can't verify the exact content restoration
+        Assert.True(File.Exists(Path.Combine(workingDir, "temp.txt")));
+        Assert.Equal("modified content", File.ReadAllText(Path.Combine(workingDir, "initial.txt")));
+        
+        // Verify the layer was not cached by trying to use it in a new session
+        var newWorkingDir = CreateTempDirectory("working2");
+        using var newSession = await Core.LayeredFileSystem.StartSession(newWorkingDir, cacheDir);
+        
+        using (var cachedLayer = await newSession.BeginLayerAsync("cancel-test"))
+        {
+            // Should not be from cache since it was cancelled
+            Assert.False(cachedLayer.IsFromCache);
+        }
     }
 
     [Fact]
@@ -277,14 +280,13 @@ public class IntegrationTests : IDisposable
         // Arrange
         var workingDir = CreateTempDirectory("working");
         var cacheDir = CreateTempDirectory("cache");
-        var fileSystem = new Core.LayeredFileSystem();
 
         // This test would need to be implemented at a lower level
         // since the current change detection naturally prevents duplicates
         // by using case-insensitive dictionaries
         
         // For now, just verify the system handles normal operations
-        using var session = await fileSystem.CreateSessionAsync(workingDir, cacheDir);
+        using var session = await Core.LayeredFileSystem.StartSession(workingDir, cacheDir);
         using var layer = await session.BeginLayerAsync("duplicate-test");
         
         File.WriteAllText(Path.Combine(workingDir, "test.txt"), "content");

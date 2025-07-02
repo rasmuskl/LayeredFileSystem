@@ -7,7 +7,7 @@
 
 ## Implementation Issues
 - [x] Fix LayerContext constructor blocking with `.Result` (potential deadlock) - LayerContext.cs:41
-- [x] Implement proper rollback for cached layers instead of throwing exception - LayerContext.cs:120-126
+- [x] Replace complex rollback with simple CancelAsync method
 - [x] Add duplicate path validation using `PathNormalizer.HasDuplicate` method
 - [x] Fix path normalization tests failing on Windows platform
 - [x] Fix layer statistics calculation - file counts are 0 but byte counts work (Windows issue)
@@ -55,7 +55,7 @@
 - ✅ Fixed LayerContext constructor deadlock (.Result blocking)
 - ✅ Fixed layer statistics calculation (file/directory counts)
 - ✅ Added duplicate path validation with proper exceptions
-- ✅ Implemented proper cached layer rollback
+- ✅ Replaced complex rollback with simple CancelAsync method
 - ✅ Fixed sample project third layer logic (cache demo with new session)
 - ✅ Created comprehensive integration tests (7 new tests)
 - ✅ Created TestFileSystemBuilder utility class

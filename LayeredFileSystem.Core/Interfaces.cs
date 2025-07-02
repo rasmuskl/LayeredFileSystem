@@ -45,9 +45,10 @@ public interface ILayerContext : IDisposable
     Task<LayerInfo> CommitAsync();
     
     /// <summary>
-    /// Cancel this layer without creating a snapshot
+    /// Cancel this layer without creating or caching a snapshot.
+    /// The working directory state is left as-is for the user to manage.
     /// </summary>
-    Task RollbackAsync();
+    Task CancelAsync();
 }
 
 public interface IChangeDetector
